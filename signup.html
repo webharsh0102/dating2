@@ -12,7 +12,7 @@
   <h2>🎓 NIT KKR - Student Sign Up</h2>
 
   <label>Roll Number:</label>
-  <input type="text" id="roll" placeholder="e.g. 123102120" required />
+  <input type="number" id="roll" placeholder="e.g. 123102120" required />
 
   <label>Password:</label>
   <input type="password" id="password" required />
@@ -30,7 +30,7 @@
     async function signUp() {
       const roll = document.getElementById('roll').value.trim();
       const password = document.getElementById('password').value.trim();
-      const email = roll + '@gmail.com';
+      const email = roll + '@nitkkr.ac.in';
 
       const { data, error } = await supabase.auth.signUp({
         email: email,
