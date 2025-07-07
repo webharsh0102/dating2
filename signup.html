@@ -30,7 +30,7 @@
     async function signUp() {
       const roll = document.getElementById('roll').value.trim();
       const password = document.getElementById('password').value.trim();
-      const email = roll + '@nitkkr.ac.in';
+      const email = roll + '@gmail.com';
 
       const { data, error } = await supabase.auth.signUp({
         email: email,
