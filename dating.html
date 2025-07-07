@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Like Someone</title>
+  <title>Send Like to DB</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
@@ -10,97 +10,75 @@
     <label>Roll Number:</label><br>
     <input type="number" id="roll_number" required><br><br>
 
-    <label>Your Name:</label><br>
-    <input type="text" id="name" required><br><br>
+    <!-- <label>Your Name:</label><br>
+    <input type="text" id="name" required><br><br> -->
 
-    <label>Who You Like (Their Roll Number):</label><br>
-    <input type="number" id="likes" required><br><br>
+    <label>Who You Like:</label><br>
+    <input type="text" id="likes" required><br><br>
 
-    <button type="submit">Submit Like</button>
+    <button type="submit">Submit</button>
   </form>
-
-  <br><br>
-  <button id="checkMatch">Check Match</button>
 
   <p id="status"></p>
 
   <script>
-    const SUPABASE_URL = 'https://wtufaboilvzfkjzzlnwt.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dWZhYm9pbHZ6Zmtqenpsbnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NzEzNjEsImV4cCI6MjA2NzQ0NzM2MX0.ntK7eFoQKamWwRaQH5Qs8J7XrtqaFPoj45wkX6aN2dI';
+    // ✅ Wait for Supabase to load
+    window.addEventListener('DOMContentLoaded', async () => {
+      // ✅ Get createClient from loaded Supabase
+      const createClient = window.supabase.createClient;
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      // ✅ Your project keys
+      const SUPABASE_URL = 'https://wtufaboilvzfkjzzlnwt.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dWZhYm9pbHZ6Zmtqenpsbnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NzEzNjEsImV4cCI6MjA2NzQ0NzM2MX0.ntK7eFoQKamWwRaQH5Qs8J7XrtqaFPoj45wkX6aN2dI';
 
-    const status = document.getElementById('status');
 
-    document.getElementById('likeForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+      // ✅ Create Supabase client
+      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      const roll_number = parseInt(document.getElementById('roll_number').value);
-      const name = document.getElementById('name').value;
-      const likes = parseInt(document.getElementById('likes').value);
+      // ✅ Handle form submission
+      document.getElementById('likeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-      // 1. Update 'likes' field of current user
-      const { error: updateError } = await supabase
-        .from('students')
-        .update({ likes })
-        .eq('roll_number', roll_number);
+        const roll_number = parseInt(document.getElementById('roll_number').value);
+        <!-- const name = document.getElementById('name').value; -->
+        const likes = document.getElementById('likes').value;
 
-      if (updateError) {
-        status.textContent = '❌ Error updating your like: ' + updateError.message;
-        return;
-      }
-
-      // 2. Check if the liked person already liked you
-      const { data: likedPersonData, error: checkError } = await supabase
-        .from('students')
-        .select('likes')
-        .eq('roll_number', likes)
-        .single();
-
-      if (checkError) {
-        status.textContent = '✅ Liked sent. Waiting for other person to like you back.';
-        return;
-      }
-
-      if (parseInt(likedPersonData.likes) === roll_number) {
-        // Mutual match! Set liked = '1' for both
-        await supabase
+        const { data :data1, error:error1 } = await supabase
           .from('students')
-          .update({ liked: '1' })
-          .in('roll_number', [roll_number, likes]);
+          .update({ likes : likes })
+          .eq('roll_number', roll_number);
 
-        status.textContent = '💖 Match Found!';
-      } else {
-        status.textContent = '✅ Like submitted. Waiting for a match.';
+        const { data : data2, error : error2 } = await supabase
+          .from('students')
+          .select('*')
+          .eq('roll_number', likes);
+        let v = 0;
+         if(data2 && data2.length > 0 && data2[0].likes == roll_number){
+          await supabase
+            .from('students')
+            .update({ liked: '1' })
+           .in('roll_number', [roll_number, likes]);
+           v = 1;
+           console.log("working 1");
+        } 
+         
+
+        const status = document.getElementById('status');
+
+        if (error1) {
+          status.textContent = '❌ Error: ' + error.message;
+        } else {
+          if(v == 1) status.textContent = ' GOT FRIENDS 💞';
+          else
+          status.textContent = '✅ Sent successfully!';
+          document.getElementById('likeForm').reset();
+        }
+       
       }
-
-      document.getElementById('likeForm').reset();
-    });
-
-    document.getElementById('checkMatch').addEventListener('click', async () => {
-      const roll_number = parseInt(document.getElementById('roll_number').value);
-
-      if (!roll_number) {
-        status.textContent = '⚠️ Please enter your roll number first.';
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('students')
-        .select('liked')
-        .eq('roll_number', roll_number)
-        .single();
-
-      if (error) {
-        status.textContent = '❌ Error checking match status: ' + error.message;
-        return;
-      }
-
-      if (data.liked === '1') {
-        status.textContent = '💞 Matched!';
-      } else {
-        status.textContent = '⏳ Still waiting for a match...';
-      }
+      
+       
+      
+      );
     });
   </script>
 </body>
