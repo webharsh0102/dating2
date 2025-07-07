@@ -44,8 +44,9 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
         const likes = document.getElementById('likes').value;
 
         const { data, error } = await supabase
-          .from('students')
-          .insert([{ roll_number, name, likes }]);
+  .from('students')
+  .update({ likes })
+  .eq('roll_number', roll_number);
 
         const status = document.getElementById('status');
         if (error) {
