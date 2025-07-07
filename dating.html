@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Send Like to DB</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+  <h2>Like Someone</h2>
+  <form id="likeForm">
+    <label>Roll Number:</label><br>
+    <input type="number" id="roll_number" required><br><br>
+
+    <label>Your Name:</label><br>
+    <input type="text" id="name" required><br><br>
+
+    <label>Who You Like:</label><br>
+    <input type="text" id="likes" required><br><br>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <p id="status"></p>
+
+  <script>
+    // ✅ Replace with your Supabase project info
+    const SUPABASE_URL = 'https://wtufaboilvzfkjzzlnwt.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dWZhYm9pbHZ6Zmtqenpsbnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NzEzNjEsImV4cCI6MjA2NzQ0NzM2MX0.ntK7eFoQKamWwRaQH5Qs8J7XrtqaFPoj45wkX6aN2dI';
+
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    document.getElementById('likeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const roll_number = parseInt(document.getElementById('roll_number').value);
+      const name = document.getElementById('name').value;
+      const likes = document.getElementById('likes').value;
+
+      const { data, error } = await supabase
+        .from('students')
+        .insert([{ roll_number, name, likes }])
+        .select();
+
+      if (error) {
+        document.getElementById('status').innerText = "❌ Error: " + error.message;
+      } else {
+        document.getElementById('status').innerText = "✅ Sent successfully!";
+        document.getElementById('likeForm').reset();
+      }
+    });
+  </script>
+</body>
+</html>
