@@ -22,30 +22,38 @@
   <p id="status"></p>
 
   <script>
-    // ✅ Replace with your Supabase project info
-    const SUPABASE_URL = 'https://wtufaboilvzfkjzzlnwt.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dWZhYm9pbHZ6Zmtqenpsbnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NzEzNjEsImV4cCI6MjA2NzQ0NzM2MX0.ntK7eFoQKamWwRaQH5Qs8J7XrtqaFPoj45wkX6aN2dI';
+    // ✅ Wait for Supabase to load
+    window.addEventListener('DOMContentLoaded', async () => {
+      // ✅ Get createClient from loaded Supabase
+      const createClient = window.supabase.createClient;
 
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      // ✅ Your project keys
+      const SUPABASE_URL = 'https://your-project-id.supabase.co';
+      const SUPABASE_ANON_KEY = 'your-anon-key';
 
-    document.getElementById('likeForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+      // ✅ Create Supabase client
+      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      const roll_number = parseInt(document.getElementById('roll_number').value);
-      const name = document.getElementById('name').value;
-      const likes = document.getElementById('likes').value;
+      // ✅ Handle form submission
+      document.getElementById('likeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-      const { data, error } = await supabase
-        .from('students')
-        .insert([{ roll_number, name, likes }])
-        .select();
+        const roll_number = parseInt(document.getElementById('roll_number').value);
+        const name = document.getElementById('name').value;
+        const likes = document.getElementById('likes').value;
 
-      if (error) {
-        document.getElementById('status').innerText = "❌ Error: " + error.message;
-      } else {
-        document.getElementById('status').innerText = "✅ Sent successfully!";
-        document.getElementById('likeForm').reset();
-      }
+        const { data, error } = await supabase
+          .from('students')
+          .insert([{ roll_number, name, likes }]);
+
+        const status = document.getElementById('status');
+        if (error) {
+          status.textContent = '❌ Error: ' + error.message;
+        } else {
+          status.textContent = '✅ Sent successfully!';
+          document.getElementById('likeForm').reset();
+        }
+      });
     });
   </script>
 </body>
