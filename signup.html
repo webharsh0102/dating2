@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sign Up - NIT KKR</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <style>
+    body { font-family: Arial; padding: 30px; }
+    input, button { margin: 10px 0; display: block; }
+  </style>
+</head>
+<body>
+  <h2>🎓 NIT KKR - Student Sign Up</h2>
+
+  <label>Roll Number:</label>
+  <input type="number" id="roll" placeholder="e.g. 123102120" required />
+
+  <label>Password:</label>
+  <input type="password" id="password" required />
+
+  <button onclick="signUp()">Sign Up</button>
+  <p id="status"></p>
+
+  <script>
+    let supabase;
+     window.addEventListener('DOMContentLoaded', async () =>{
+        const createClient = window.supabase.createClient;
+     supabase = createClient('https://wtufaboilvzfkjzzlnwt.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dWZhYm9pbHZ6Zmtqenpsbnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NzEzNjEsImV4cCI6MjA2NzQ0NzM2MX0.ntK7eFoQKamWwRaQH5Qs8J7XrtqaFPoj45wkX6aN2dI');
+
+    });
+    async function signUp() {
+      const roll = document.getElementById('roll').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const email = roll + '@nitkkr.ac.in';
+
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: { roll_number: roll }
+        }
+      });
+
+      const status = document.getElementById('status');
+      if (error) {
+        status.textContent = '❌ ' + error.message;
+      } else {
+        status.textContent = '✅ OTP sent to your email. Please verify to complete registration.';
+        // Save in your own table if needed
+        await supabase.from('students').insert({ roll_number: roll, email: email });
+      }
+    }
+  </script>
+</body>
+</html>
