@@ -1,84 +1,154 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Send Like (with Auth)</title>
+  <title>Send Like (Secure Auth)</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 25px;
+      background-color: #007bff;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #status {
+      text-align: center;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #007bff;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 20px;
+      }
+
+      .container {
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h2>Like Someone (Secure)</h2>
-  <form id="likeForm">
-    <label>Roll Number:</label><br>
-    <input type="number" id="roll_number" required><br><br>
+  <div class="container">
+    <h2>💖 Send Like (Secure)</h2>
 
-    <label>Password:</label><br>
-    <input type="password" id="password" required><br><br>
+    <form id="likeForm">
+      <label>💘 Who You Like (Roll No.):</label>
+      <input type="number" id="likes" required placeholder="Enter their Roll No.">
 
-    <label>Who You Like (Roll No.):</label><br>
-    <input type="number" id="likes" required><br><br>
+      <button type="submit">Send Like 💌</button>
+    </form>
 
-    <button type="submit">Submit</button>
-  </form>
-
-  <p id="status"></p>
+    <p id="status"></p>
+  </div>
 
   <script>
-     window.addEventListener('DOMContentLoaded', async () =>{
-        const createClient = window.supabase.createClient;
-     supabase = createClient('https://wtufaboilvzfkjzzlnwt.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dWZhYm9pbHZ6Zmtqenpsbnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NzEzNjEsImV4cCI6MjA2NzQ0NzM2MX0.ntK7eFoQKamWwRaQH5Qs8J7XrtqaFPoj45wkX6aN2dI');
+    let supabase;
+    window.addEventListener('DOMContentLoaded', async () => {
+      const createClient = window.supabase.createClient;
+      supabase = createClient(
+        'https://wtufaboilvzfkjzzlnwt.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dWZhYm9pbHZ6Zmtqenpsbnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NzEzNjEsImV4cCI6MjA2NzQ0NzM2MX0.ntK7eFoQKamWwRaQH5Qs8J7XrtqaFPoj45wkX6aN2dI'
+      );
 
-    document.getElementById('likeForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+      document.getElementById('likeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-      const roll_number = document.getElementById('roll_number').value;
-      const password = document.getElementById('password').value;
-      const likes = document.getElementById('likes').value;
-      const status = document.getElementById('status');
+        
+        const likes = document.getElementById('likes').value.trim();
+        const status = document.getElementById('status');
+        const {
+             data: { user }
+             } = await supabase.auth.getUser();
 
-      const email = `${roll_number}@nitkkr.ac.in`;
+         const roll_number = user.user_metadata.roll_number; 
+         console.log(roll_number);// 👉 "123102120@nitkkr.ac.in"
 
-      // Step 1: Login user
-      const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (loginError) {
-        status.textContent = '❌ Login failed: ' + loginError.message;
-        return;
-      }
-
-      // Step 2: Update likes for this roll number
-      const { data: updateData, error: updateError } = await supabase
-        .from('students')
-        .update({ likes: likes })
-        .eq('roll_number', roll_number);
-
-      if (updateError) {
-        status.textContent = '❌ Failed to update: ' + updateError.message;
-        return;
-      }
-
-      // Step 3: Check mutual like
-      const { data: likedUser, error: likeFetchError } = await supabase
-        .from('students')
-        .select('likes')
-        .eq('roll_number', likes);
-
-      if (likedUser.length > 0 && likedUser[0].likes == roll_number) {
-        // Update both records' liked = 1
-        await supabase
+        const email = `${roll_number}@nitkkr.ac.in`;
+        
+        // Step 2: Update 'likes'
+        const { data: updateData, error: updateError } = await supabase
           .from('students')
-          .update({ liked: '1' })
-          .in('roll_number', [roll_number, likes]);
+          .update({ likes: likes })
+          .eq('roll_number', roll_number);
 
-        status.textContent = '💘 Match found!';
-      } else {
-        status.textContent = '✅ Like submitted. Waiting for mutual like.';
-      }
+        if (updateError) {
+          status.style.color = 'red';
+          status.textContent = '❌ Failed to update like: ' + updateError.message;
+          return;
+        }
 
-      document.getElementById('likeForm').reset();
+        // Step 3: Check if mutual like
+        const { data: likedUser, error: likeFetchError } = await supabase
+          .from('students')
+          .select('likes')
+          .eq('roll_number', likes);
+
+        if (likedUser.length > 0 && likedUser[0].likes == roll_number) {
+          await supabase
+            .from('students')
+            .update({ liked: '1' })
+            .in('roll_number', [roll_number, likes]);
+
+          status.style.color = 'green';
+          status.textContent = '💘 Match found!';
+        } else {
+          status.style.color = '#007bff';
+          status.textContent = '✅ Like submitted. Waiting for mutual like.';
+        }
+
+        document.getElementById('likeForm').reset();
+      });
     });
-});
   </script>
 </body>
 </html>
