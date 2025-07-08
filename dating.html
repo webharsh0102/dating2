@@ -89,6 +89,13 @@
     </form>
 
     <p id="status"></p>
+
+     <form id="checkMatchForm">
+      <label>🔍 Check Match Status:</label>
+      <button type="submit">Check 💑</button>
+    </form>
+
+    <p id="matchStatus"></p>
   </div>
 
   <script>
@@ -109,7 +116,10 @@
         const {
              data: { user }
              } = await supabase.auth.getUser();
-
+         if(user == null){
+           status.style.color = 'red';
+          status.textContent = 'pls sign in again ';
+         }
          const roll_number = user.user_metadata.roll_number; 
          console.log(roll_number);// 👉 "123102120@nitkkr.ac.in"
 
@@ -119,7 +129,8 @@
         const { data: updateData, error: updateError } = await supabase
           .from('students')
           .update({ likes: likes })
-          .eq('roll_number', roll_number);
+          .eq('roll_number', roll_number)
+          .select();
 
         if (updateError) {
           status.style.color = 'red';
@@ -128,25 +139,46 @@
         }
 
         // Step 3: Check if mutual like
-        const { data: likedUser, error: likeFetchError } = await supabase
-          .from('students')
-          .select('likes')
-          .eq('roll_number', likes);
-
-        if (likedUser.length > 0 && likedUser[0].likes == roll_number) {
-          await supabase
-            .from('students')
-            .update({ liked: '1' })
-            .in('roll_number', [roll_number, likes]);
-
-          status.style.color = 'green';
-          status.textContent = '💘 Match found!';
-        } else {
           status.style.color = '#007bff';
-          status.textContent = '✅ Like submitted. Waiting for mutual like.';
+          status.textContent = '✅ Like will be shared on that time  u can edit before it';
+        
+        
+        document.getElementById('likeForm').reset();
+      });
+       document.getElementById('checkMatchForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const matchStatus = document.getElementById('matchStatus');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+          matchStatus.style.color = 'red';
+          matchStatus.textContent = '❌ Please sign in to check match.';
+          return;
         }
 
-        document.getElementById('likeForm').reset();
+        const roll_number = user.user_metadata.roll_number;
+
+        const { data, error } = await supabase
+          .from('students')
+          .select('likes, liked')
+          .eq('roll_number', roll_number);
+
+        if (error || !data || data.length === 0) {
+          matchStatus.style.color = 'red';
+          matchStatus.textContent = '❌ Could not fetch your record.';
+          return;
+        }
+
+        const liked = data[0].liked;
+        
+
+        if (liked != 0) {
+          matchStatus.style.color = 'green';
+          matchStatus.textContent = `last 💘 Matched with Roll No. ${liked}`;
+        } else {
+          matchStatus.style.color = '#555';
+          matchStatus.textContent = '⌛ No match yet. Try again later.';
+        }
       });
     });
   </script>
