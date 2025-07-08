@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Send Like (Secure Auth)</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 25px;
+      background-color: #007bff;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #status {
+      text-align: center;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #007bff;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 20px;
+      }
+
+      .container {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>💖 Send Like (Secure)</h2>
+
+    <form id="likeForm">
+      <label>🎓 Roll Number:</label>
+      <input type="number" id="roll_number" required placeholder="Enter your Roll No.">
+
+      <label>🔒 Password:</label>
+      <input type="password" id="password" required placeholder="Enter your password">
+
+      
+      <button type="submit">Sign in </button>
+    </form>
+
+    <p id="status"></p>
+  </div>
+
+  <script>
+    let supabase;
+    window.addEventListener('DOMContentLoaded', async () => {
+      const createClient = window.supabase.createClient;
+      supabase = createClient(
+        'https://wtufaboilvzfkjzzlnwt.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dWZhYm9pbHZ6Zmtqenpsbnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NzEzNjEsImV4cCI6MjA2NzQ0NzM2MX0.ntK7eFoQKamWwRaQH5Qs8J7XrtqaFPoj45wkX6aN2dI'
+      );
+
+      document.getElementById('likeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const roll_number = document.getElementById('roll_number').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const status = document.getElementById('status');
+
+        const email = `${roll_number}@nitkkr.ac.in`;
+
+        // Step 1: Login
+        const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (loginError) {
+          status.style.color = 'red';
+          status.textContent = '❌ Login failed: ' + loginError.message;
+          return;
+        }
+
+        document.getElementById('likeForm').reset();
+        window.location.href = 'dating.html';  // Replace with your actual page
+
+      });
+    });
+  </script>
+</body>
+</html>
