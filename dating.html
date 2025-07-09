@@ -181,7 +181,8 @@
 
     <p id="matchStatus"></p>
   </div>
- <div class="container" id="card">
+  
+  <div class="container" id="card">
     <div id = "swipeZone">
       <div class="confession-text" id="confessionText2">Loading...</div>
     <div class="heart">❤️</div>
@@ -195,14 +196,52 @@
     <button onclick="submitConfession()">Send Confession</button>
   </div>
   <script>
-     const swipeZone = document.getElementById('swipeZone');
-     const hammer = new Hammer(swipeZone);
+     
+    let startX = 0;
+const swipeZone = document.getElementById('swipeZone');
 
-      hammer.on('swipeleft swiperight', function(ev) {
-       if (ev.type === 'swipeleft' || ev.type === 'swiperight') {
-        showNext(); // your function to show next confession
-       }
+// --- Touch Events for Phones ---
+swipeZone.addEventListener('touchstart', (e) => {
+  startX = e.touches[0].clientX;
+}, { passive: true });
+
+swipeZone.addEventListener('touchend', (e) => {
+  const endX = e.changedTouches[0].clientX;
+  handleSwipe(endX - startX);
+}, { passive: true });
+
+// --- Mouse Events for Laptops ---
+swipeZone.addEventListener('mousedown', (e) => {
+  startX = e.clientX;
+
+  function onMouseUp(ev) {
+    const endX = ev.clientX;
+    handleSwipe(endX - startX);
+    document.removeEventListener('mouseup', onMouseUp);
+  }
+
+  document.addEventListener('mouseup', onMouseUp);
 });
+
+// --- Swipe Logic ---
+function handleSwipe(diffX) {
+  const threshold = 50;
+  if (diffX > threshold) {
+    swipeZone.style.transform = 'translateX(100px)';
+    setTimeout(() => {
+      swipeZone.style.transform = 'translateX(0)';
+      showNext(); // show next confession
+    }, 200);
+  } else if (diffX < -threshold) {
+    swipeZone.style.transform = 'translateX(-100px)';
+    setTimeout(() => {
+      swipeZone.style.transform = 'translateX(0)';
+      showNext(); // show next confession
+    }, 200);
+  }
+}
+
+     
      const supabase = window.supabase.createClient(
       'https://wtufaboilvzfkjzzlnwt.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dWZhYm9pbHZ6Zmtqenpsbnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NzEzNjEsImV4cCI6MjA2NzQ0NzM2MX0.ntK7eFoQKamWwRaQH5Qs8J7XrtqaFPoj45wkX6aN2dI' // Replace with anon/public key
