@@ -181,9 +181,9 @@
 
     <p id="matchStatus"></p>
   </div>
-  
+  <div id = "swipeZone">
   <div class="container" id="card">
-    <div id = "swipeZone">
+    
       <div class="confession-text" id="confessionText2">Loading...</div>
     <div class="heart">❤️</div>
     <div class="like-count" id="likeCount"></div>
@@ -226,20 +226,44 @@ swipeZone.addEventListener('mousedown', (e) => {
 // --- Swipe Logic ---
 function handleSwipe(diffX) {
   const threshold = 50;
+
   if (diffX > threshold) {
-    swipeZone.style.transform = 'translateX(100px)';
+    swipeZone.style.transform = 'translateX(120%) rotate(10deg)';
+    swipeZone.style.opacity = 0;
     setTimeout(() => {
-      swipeZone.style.transform = 'translateX(0)';
-      showNext(); // show next confession
-    }, 200);
+      swipeZone.style.transition = 'none';  // Remove transition for instant reset
+      swipeZone.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+      swipeZone.style.transform = 'translateX(-120%) rotate(-10deg)';
+      swipeZone.style.opacity = 0;
+
+      showNext(); // Change content
+
+      requestAnimationFrame(() => {
+        swipeZone.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+        swipeZone.style.transform = 'translateX(0) rotate(0)';
+        swipeZone.style.opacity = 1;
+      });
+    }, 300);
+
   } else if (diffX < -threshold) {
-    swipeZone.style.transform = 'translateX(-100px)';
+    swipeZone.style.transform = 'translateX(-120%) rotate(-10deg)';
+    swipeZone.style.opacity = 0;
     setTimeout(() => {
-      swipeZone.style.transform = 'translateX(0)';
-      showNext(); // show next confession
-    }, 200);
+      swipeZone.style.transition = 'none';
+      swipeZone.style.transform = 'translateX(120%) rotate(10deg)';
+      swipeZone.style.opacity = 0;
+
+      showNext();
+
+      requestAnimationFrame(() => {
+        swipeZone.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+        swipeZone.style.transform = 'translateX(0) rotate(0)';
+        swipeZone.style.opacity = 1;
+      });
+    }, 300);
   }
 }
+
 
      
      const supabase = window.supabase.createClient(
