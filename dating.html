@@ -243,29 +243,12 @@ swipeZone.addEventListener('mousedown', (e) => {
 function handleSwipe(diffX) {
   const threshold = 50;
 
-  if (diffX > threshold) {
-    swipeZone.style.transform = 'translateX(120%) rotate(10deg)';
-    swipeZone.style.opacity = 0;
-    setTimeout(() => {
-      swipeZone.style.transition = 'none';  // Remove transition for instant reset
-      swipeZone.style.transform = 'translateX(-120%) rotate(-10deg)';
-      swipeZone.style.opacity = 0;
-
-      showNext(); // Change content
-
-      requestAnimationFrame(() => {
-        swipeZone.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
-        swipeZone.style.transform = 'translateX(0) rotate(0)';
-        swipeZone.style.opacity = 1;
-      });
-    }, 300);
-
-  } else if (diffX < -threshold) {
+  if (diffX < -threshold) {
     swipeZone.style.transform = 'translateX(-120%) rotate(-10deg)';
     swipeZone.style.opacity = 0;
     setTimeout(() => {
       swipeZone.style.transition = 'none';
-      swipeZone.style.transform = 'translateX(120%) rotate(10deg)';
+      swipeZone.style.transform = 'translateX(-120%) rotate(-10deg)';
       swipeZone.style.opacity = 0;
 
       showNext();
