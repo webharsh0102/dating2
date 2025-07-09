@@ -11,6 +11,7 @@
     * {
   box-sizing: border-box;
 }
+   
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
           background: linear-gradient(136deg, #5edaff 0%, #a27fcd 100%);
@@ -21,6 +22,7 @@
       padding: 40px;
       height: auto; 
       min-height: 100vh;
+      
     }
 
     .container {
@@ -234,7 +236,6 @@ function handleSwipe(diffX) {
     swipeZone.style.opacity = 0;
     setTimeout(() => {
       swipeZone.style.transition = 'none';  // Remove transition for instant reset
-      swipeZone.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
       swipeZone.style.transform = 'translateX(-120%) rotate(-10deg)';
       swipeZone.style.opacity = 0;
 
@@ -265,7 +266,6 @@ function handleSwipe(diffX) {
     }, 300);
   }
 }
-
 
      
      const supabase = window.supabase.createClient(
