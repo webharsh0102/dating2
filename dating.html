@@ -22,12 +22,6 @@
       padding: 40px;
       height: auto; 
       min-height: 100vh;
-      overflow-x: hidden;
-      overflow-y: hidden;
-       background-repeat: no-repeat;
-  background-attachment: scroll;
-  background-size: cover;
-      max-width: 100vw;
       
     }
 
@@ -169,12 +163,6 @@
         padding: 20px;
       }
     }
-    #swipeZone {
-  max-width: 100%;
-  box-sizing: border-box;
-  overflow-x: hidden;
-}
-
   </style>
 </head>
 <body>
@@ -243,7 +231,7 @@ swipeZone.addEventListener('mousedown', (e) => {
 function handleSwipe(diffX) {
   const threshold = 50;
 
-  if (diffX < -threshold) {
+   if (diffX < -threshold) {
     swipeZone.style.transform = 'translateX(-120%) rotate(-10deg)';
     swipeZone.style.opacity = 0;
     setTimeout(() => {
