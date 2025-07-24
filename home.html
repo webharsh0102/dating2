@@ -175,7 +175,7 @@
         status.style.color = 'red';
         status.textContent = " please wait";
         const { data: da, error: er } = await supabase.auth.resetPasswordForEmail(email, {
-  redirectTo: "http://127.0.0.1:5500/reset.html"
+  redirectTo: "https://dating2-k6ua.vercel.app/home.html"
 });
 status.textContent = "";
 if (er) {
