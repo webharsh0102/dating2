@@ -20,7 +20,7 @@
       flex-direction: column;
       align-items: center;
       padding: 40px;
-      height: auto; 
+      height: 100%; 
       min-height: 100vh;
       
     }
@@ -30,10 +30,35 @@
       padding: 30px;
       border-radius: 12px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 400px;
+      width: 75%;
+      
+      height: auto;
+      
       box-shadow: -25px -20px 50px 8px rgb(20 6 252 / 20%);
       margin-bottom: 50px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .switch{
+     display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      width: 80%;
+      margin-top: 10px;
+    }
+    .inswitch{
+        font-family:    Arial, Helvetica, sans-serif;
+        font-size:  140%;
+        font-weight:    bold;
+        padding: 5%;
+        width: 35%;
+        word-wrap: break-word;
+        background-color: #e0e0e0; /* Neutral/relative to background */
+  border: 2px solid #b0b0b0; /* Border to stand out */
+  border-radius: 30px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2); /* Raised effect */
+ 
     }
 
     h2 {
@@ -166,24 +191,21 @@
   </style>
 </head>
 <body>
+  
   <div class="container">
-    <h2>💖 Send Like (Secure)</h2>
+    <h2>📝 Share a Confession</h2>
+    <textarea class="confession-text" id="confessionText" placeholder="Write your anonymous message here..."></textarea>
+    <button onclick="submitConfession()">Send Confession</button>
+    <div class="switch" class="incont">
+        <div class="inswitch" id="cnfwall">
+            Confession wall
 
-    <form id="likeForm">
-      <label>💘 Who You Like (Roll No.):</label>
-      <input type="number" id="likes" required placeholder="Enter their Roll No.">
+        </div>
+        <div class="inswitch" id="likewall">
+            share like
 
-      <button type="submit">Send Like 💌</button>
-    </form>
-
-    <p id="status"></p>
-
-     <form id="checkMatchForm">
-      <label>🔍 Check Match Status:</label>
-      <button type="submit">Check 💑</button>
-    </form>
-
-    <p id="matchStatus"></p>
+        </div>
+    </div>
   </div>
   <div id = "swipeZone">
   <div class="container" id="card">
@@ -193,14 +215,20 @@
     <div class="like-count" id="likeCount"></div>
     </div>
     
+    
   </div>
-  <div class="container">
-    <h2>📝 Share a Confession</h2>
-    <textarea class="confession-text" id="confessionText" placeholder="Write your anonymous message here..."></textarea>
-    <button onclick="submitConfession()">Send Confession</button>
-  </div>
+  
+
+
+
   <script>
-     
+    document.getElementById('likewall').addEventListener('click', async (e) => {
+         window.location.href = "datingp2.html";
+    });
+    const supabase = window.supabase.createClient(
+      'https://wtufaboilvzfkjzzlnwt.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dWZhYm9pbHZ6Zmtqenpsbnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NzEzNjEsImV4cCI6MjA2NzQ0NzM2MX0.ntK7eFoQKamWwRaQH5Qs8J7XrtqaFPoj45wkX6aN2dI' // Replace with anon/public key
+    );
     let startX = 0;
 const swipeZone = document.getElementById('swipeZone');
 
@@ -251,111 +279,28 @@ function handleSwipe(diffX) {
 }
 
      
-     const supabase = window.supabase.createClient(
-      'https://wtufaboilvzfkjzzlnwt.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dWZhYm9pbHZ6Zmtqenpsbnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NzEzNjEsImV4cCI6MjA2NzQ0NzM2MX0.ntK7eFoQKamWwRaQH5Qs8J7XrtqaFPoj45wkX6aN2dI' // Replace with anon/public key
-    );
+     
     window.addEventListener('DOMContentLoaded', async () => {
       
+    
 
-      document.getElementById('likeForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        
-        const likes = document.getElementById('likes').value.trim();
-        const status = document.getElementById('status');
-        const {
-             data: { user }
-             } = await supabase.auth.getUser();
-         if(user == null){
-           status.style.color = 'red';
-          status.textContent = 'pls sign in again ';
-         }
-         const roll_number = user.user_metadata.roll_number; 
-         console.log(roll_number);// 👉 "123102120@nitkkr.ac.in"
-
-        const email = `${roll_number}@nitkkr.ac.in`;
-        
-        // Step 2: Update 'likes'
-        const { data: updateData, error: updateError } = await supabase
-          .from('students')
-          .update({ likes: likes })
-          .eq('roll_number', roll_number)
-          .select();
-
-        if (updateError) {
-          status.style.color = 'red';
-          status.textContent = '❌ Failed to update like: ' + updateError.message;
-          return;
-        }
-
-        // Step 3: Check if mutual like
-          status.style.color = '#007bff';
-          status.textContent = '✅ Like will be shared on that time  u can edit before it';
-          Swal.fire({
-          title: '💖 Like Sent!',
-           text: 'your liked will be shared today night',
-           icon: 'success',
-           <!-- showCancelButton: true, -->
-            confirmButtonText: 'okay',
-      
-            customClass: {
-             popup: 'my-swal',
-            confirmButton: 'my-confirm-btn'
+  
+  const { data: { session } } = await supabase.auth.getSession();
+  console.log(session);
+   if (!session) {
+    alert("You must be logged in to view this page.");
+    window.location.href = "home.html"; // Redirect to login
   }
-             
-            });
-        
-        document.getElementById('likeForm').reset();
-      });
-       document.getElementById('checkMatchForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const matchStatus = document.getElementById('matchStatus');
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
-          matchStatus.style.color = 'red';
-          matchStatus.textContent = '❌ Please sign in to check match.';
-          return;
-        }
-
-        const roll_number = user.user_metadata.roll_number;
-
-        const { data, error } = await supabase
+  else{
+    const { data : d, error : e } = await supabase
           .from('students')
-          .select('likes, liked')
-          .eq('roll_number', roll_number);
-
-        if (error || !data || data.length === 0) {
-          matchStatus.style.color = 'red';
-          matchStatus.textContent = '❌ Could not fetch your record.';
-          return;
-        }
-
-        const liked = data[0].liked;
-        
-
-        if (liked != 0) {
-          matchStatus.style.color = 'green';
-          matchStatus.textContent = `last 💘 Matched with Roll No. ${liked}`;
-          Swal.fire({
-             title: '💘 Match Found!',
-             text: `You and ${liked} liked each other!`,
-              icon: 'success',
-              confirmButtonText: 'Yay!',
-              customClass: {
-             popup: 'my-swal',
-            confirmButton: 'my-confirm-btn'
-  }
-            });
-        } else {
-          matchStatus.style.color = '#555';
-          matchStatus.textContent = '⌛ No match yet. Try again later.';
-        }
-      });
-
-      
-    });
+          .select('likes, liked');
+     
+          if(!d){
+             alert("You must be logged in to view this page.");
+    window.location.href = "home.html"; // Redirect to login
+          }
+  } });
     async function submitConfession() {
       const text = document.getElementById('confessionText').value.trim();
       if (!text) {
@@ -430,7 +375,7 @@ function handleSwipe(diffX) {
       if (!error) {
         confessions[current].likes++;
         document.getElementById('likeCount').textContent = `${conf.likes + 1} ❤️ likes`;
-        Swal.fire('Liked!', '', 'success');
+        
       }
     }
 

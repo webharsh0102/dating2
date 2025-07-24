@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Confession Wall</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+  margin: 0;
+  min-height: 100vh;
+  box-sizing: border-box;
+    }
+
+    #card {
+      background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 500px;
+  text-align: center;
+  position: relative;
+  margin-bottom: 50px;
+    }
+
+    .confession-text {
+      font-size: 18px;
+      font-style: italic;
+      color: #444;
+      margin-bottom: 20px;
+      border: 5px solid #a8ae1f;
+      padding: 10px 20px 10px 20px;
+       word-wrap: break-word; /* ✅ force wrapping */
+  white-space: pre-wrap; 
+    }
+
+    .like-count {
+      color: #e63946;
+      font-weight: bold;
+    }
+
+    .next-btn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border: none;
+      background-color: #e63946;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .heart {
+      font-size: 30px;
+      color: #e63946;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="card">
+    <div class="confession-text" id="confessionText">Loading...</div>
+    <div class="heart">❤️</div>
+    <div class="like-count" id="likeCount"></div>
+    <button class="next-btn" onclick="showNext()">Next</button>
+  </div>
+
+  <script>
+    const supabase = window.supabase.createClient(
+      'https://wtufaboilvzfkjzzlnwt.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dWZhYm9pbHZ6Zmtqenpsbnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NzEzNjEsImV4cCI6MjA2NzQ0NzM2MX0.ntK7eFoQKamWwRaQH5Qs8J7XrtqaFPoj45wkX6aN2dI' // Replace with anon/public key
+    );
+
+    let confessions = [];
+    let current = 0;
+
+    async function fetchConfessions() {
+      const { data, error } = await supabase
+        .from('anonymous_confessions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        document.getElementById('confessionText').textContent = 'Error loading confessions';
+        return;
+      }
+
+      confessions = data;
+      if (confessions.length > 0) showConfession();
+      else document.getElementById('confessionText').textContent = 'No confessions yet.';
+    }
+
+    function showConfession() {
+      const conf = confessions[current];
+      document.getElementById('confessionText').textContent = conf.message;
+      document.getElementById('likeCount').textContent = `${conf.likes} ❤️ likes`;
+    }
+
+    function showNext() {
+      if (confessions.length === 0) return;
+      current = (current + 1) % confessions.length;
+      showConfession();
+    }
+
+    async function likeConfession() {
+      const conf = confessions[current];
+      const { data, error } = await supabase
+        .from('confessions')
+        .update({ likes: conf.likes + 1 })
+        .eq('id', conf.id)
+        .select();
+
+      if (!error) {
+        confessions[current].likes++;
+        document.getElementById('likeCount').textContent = `${conf.likes + 1} ❤️ likes`;
+        Swal.fire('Liked!', '', 'success');
+      }
+    }
+
+    document.getElementById('card').addEventListener('dblclick', likeConfession);
+
+    fetchConfessions();
+  </script>
+</body>
+</html>

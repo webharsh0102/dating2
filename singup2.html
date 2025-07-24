@@ -129,22 +129,17 @@
       
 
       
-      <button type="submit">Sign in </button>
+       <button onclick="signUp()">Sign Up</button>
     </form>
     <div id="or">
       _________________OR____________________
     </div>
-    <div>Don't have account?   <a href="singup2.html"><b>Sign up</b></a></div>
-    <div> Forget password ?
-       <span id= "forget" style="color:#007bff"> <b>click </b>
-      </span> 
-    </div>
+    <div>Already have account?   <a href="home.html"><b>Sign in</b></a></div>
 
     <p id="status"></p>
   </div>
 
-  <script>
-    
+   <script>
     function togglePassword() {
     const passwordInput = document.getElementById('password');
     const eyeIcon = document.querySelector('.eye-icon');
@@ -158,66 +153,38 @@
     }
   }
     let supabase;
-    const status = document.getElementById('status');
     window.addEventListener('DOMContentLoaded', async () => {
       const createClient = window.supabase.createClient;
       supabase = createClient(
         'https://wtufaboilvzfkjzzlnwt.supabase.co',
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dWZhYm9pbHZ6Zmtqenpsbnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NzEzNjEsImV4cCI6MjA2NzQ0NzM2MX0.ntK7eFoQKamWwRaQH5Qs8J7XrtqaFPoj45wkX6aN2dI'
       );
-
-      document.getElementById('forget').addEventListener('click', async (e) =>{
-      
-      let email = document.getElementById('roll_number').value.trim();
-      
-      if(email > 0){
-        email = `${email}@nitkkr.ac.in`;
-        status.style.color = 'red';
-        status.textContent = " please wait";
-        const { data: da, error: er } = await supabase.auth.resetPasswordForEmail(email, {
-  redirectTo: "http://127.0.0.1:5500/reset.html"
-});
-status.textContent = "";
-if (er) {
-  console.error(er);
-  alert("Error sending reset email.");
-} else {
-  alert("Reset email sent successfully. Check your inbox.");
-}
-        
-      }
-      else
-      {alert("pls ensure u have enter roll numer"); }
-
-      });
-
-      document.getElementById('likeForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const roll_number = document.getElementById('roll_number').value.trim();
-        const password = document.getElementById('password').value.trim();
-        
-
-        const email = `${roll_number}@nitkkr.ac.in`;
-        status.textContent='';
-
-        // Step 1: Login
-        const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (loginError) {
-          status.style.color = 'red';
-          status.textContent = '❌ Login failed: ' + loginError.message;
-          return;
-        }
-
-        document.getElementById('likeForm').reset();
-        window.location.href = 'dating.html';  // Replace with your actual page
-
-      });
     });
+
+    async function signUp() {
+      const roll = document.getElementById('roll').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const email = roll + '@nitkkr.ac.in';
+      const status = document.getElementById('status');
+
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: { roll_number: roll },
+          emailRedirectTo: 'https://dating2-git-main-webharsh0102s-projects.vercel.app/dating.html'
+        }
+      });
+
+      if (error) {
+        status.style.color = 'red';
+        status.textContent = '❌ ' + error.message;
+      } else {
+        status.style.color = 'green';
+        status.textContent = '✅ OTP sent to your NITKKR email. Please verify to complete registration.';
+        await supabase.from('students').insert({ roll_number: roll, email: email });
+      }
+    }
   </script>
 </body>
 </html>

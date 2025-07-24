@@ -122,24 +122,16 @@
 
     <form id="likeForm">
       <div class="inp"><input type="number" id="roll_number" required placeholder="Enter your Roll No."></div>
-      <div class="inp" id="passcolm"><input type="password" id="password" ondbclick="togglePassword()" required placeholder="Enter  password">
+      <div class="inp" id="passcolm"><input type="password" id="password" ondbclick="togglePassword()" required placeholder="New password">
       <span class="eye-icon" onclick="togglePassword()">
     👁️
   </span></div>
       
 
       
-      <button type="submit">Sign in </button>
+      <button id = "upd" type="submit">Update it.</button>
     </form>
-    <div id="or">
-      _________________OR____________________
-    </div>
-    <div>Don't have account?   <a href="singup2.html"><b>Sign up</b></a></div>
-    <div> Forget password ?
-       <span id= "forget" style="color:#007bff"> <b>click </b>
-      </span> 
-    </div>
-
+    
     <p id="status"></p>
   </div>
 
@@ -158,65 +150,27 @@
     }
   }
     let supabase;
-    const status = document.getElementById('status');
     window.addEventListener('DOMContentLoaded', async () => {
       const createClient = window.supabase.createClient;
       supabase = createClient(
         'https://wtufaboilvzfkjzzlnwt.supabase.co',
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dWZhYm9pbHZ6Zmtqenpsbnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NzEzNjEsImV4cCI6MjA2NzQ0NzM2MX0.ntK7eFoQKamWwRaQH5Qs8J7XrtqaFPoj45wkX6aN2dI'
       );
+      
 
-      document.getElementById('forget').addEventListener('click', async (e) =>{
-      
-      let email = document.getElementById('roll_number').value.trim();
-      
-      if(email > 0){
-        email = `${email}@nitkkr.ac.in`;
-        status.style.color = 'red';
-        status.textContent = " please wait";
-        const { data: da, error: er } = await supabase.auth.resetPasswordForEmail(email, {
-  redirectTo: "http://127.0.0.1:5500/reset.html"
-});
-status.textContent = "";
-if (er) {
-  console.error(er);
-  alert("Error sending reset email.");
-} else {
-  alert("Reset email sent successfully. Check your inbox.");
-}
-        
+      document.getElementById('upd').addEventListener('click', async () => {
+      const newPassword = document.getElementById('password').value;
+
+      const { data, error } = await supabase.auth.updateUser({ password: newPassword });
+
+      if (error) {
+        alert('Error updating password: ' + error.message);
+      } else {
+        alert('Password updated successfully!');
+        window.location.href = 'home.html'; // or wherever you want
       }
-      else
-      {alert("pls ensure u have enter roll numer"); }
-
-      });
-
-      document.getElementById('likeForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const roll_number = document.getElementById('roll_number').value.trim();
-        const password = document.getElementById('password').value.trim();
+    });
         
-
-        const email = `${roll_number}@nitkkr.ac.in`;
-        status.textContent='';
-
-        // Step 1: Login
-        const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (loginError) {
-          status.style.color = 'red';
-          status.textContent = '❌ Login failed: ' + loginError.message;
-          return;
-        }
-
-        document.getElementById('likeForm').reset();
-        window.location.href = 'dating.html';  // Replace with your actual page
-
-      });
     });
   </script>
 </body>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Send Like (Secure Auth)</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+
+  
+  <style>
+    * {
+  box-sizing: border-box;
+}
+   html{
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      color: aliceblue;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+       
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+       background: linear-gradient(136deg, #5edaff 0%, #a27fcd 100%);    
+      background-attachment: fixed;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+      height: 100%;
+      width: 100%; 
+      
+      
+    }
+
+    .container {
+      background: linear-gradient(136deg, #FF5E78 20%, #FFC1CC 100%);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      width: 75%;
+      
+      height: auto;
+      
+      box-shadow: -25px -20px 50px 8px rgb(20 6 252 / 20%);
+      margin-bottom: 50px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      
+      
+    }
+    .incont{
+        width: 80%;
+
+    }
+    .switch{
+     display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      width: 80%;
+    }
+    .inswitch{
+        font-family:    Arial, Helvetica, sans-serif;
+        font-size:  140%;
+        font-weight:    bold;
+        padding: 5%;
+        width: 35%;
+        word-wrap: break-word;
+        background-color: #e0e0e0; /* Neutral/relative to background */
+  border: 2px solid #b0b0b0; /* Border to stand out */
+  border-radius: 30px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2); /* Raised effect */
+ 
+    }
+
+    h2 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+
+    input {
+     width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    border-radius: 20px;
+    border: 2px solid whitesmoke;
+    background-color: #cb3163;
+    color: #f9f5f5;
+    text-decoration: underline wavy #ff4d6d;
+    font-weight: 600;
+    text-underline-offset: 5px;
+    text-shadow: 1px 1px 2px rgba(255, 77, 109, 0.3);
+    }
+
+    button {
+          width: 100%;
+    padding: 12px;
+    margin-top: 25px;
+    background-color: #b345e8;
+    color: white;
+    font-weight: 100;
+    border: 0px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: cursive;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #status {
+      text-align: center;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #007bff;
+    }
+    .my-swal {
+    background-color: #FFF0F3;
+    color: #E63946;
+    border: 1px solid #FF5E78;
+  }
+
+  .my-confirm-btn {
+    background-color: #FF5E78 !important;
+    color: white !important;
+    border-radius: 6px !important;
+  }
+ 
+   input::placeholder {
+  color: #f9f5f5; /* pinkish red */
+  font-weight: 500;
+  opacity: 1; /* make sure it doesn't appear faded */
+}
+
+ 
+
+    .like-count {
+      color: #e63946;
+      font-weight: bold;
+    }
+
+    
+
+    @media (max-width: 480px) {
+      body {
+        padding: 20px;
+      }
+
+      .container {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>💖 Send Like (Secure)</h2>
+
+    <form id="likeForm" class="incont">
+      <label>💘 Who You Like (Roll No.):</label>
+      <input type="number" id="likes" required placeholder="Enter their Roll No.">
+
+      <button type="submit">Send Like 💌</button>
+    </form>
+
+    <p id="status" class="incont"></p>
+
+     <form id="checkMatchForm" class="incont">
+      <label>🔍 Check Match Status:</label>
+      <button type="submit">Check 💑</button>
+    </form>
+
+    <p id="matchStatus" class="incont"></p>
+    <div class="switch" class="incont">
+        <div class="inswitch" id="cnfwall">
+            Confession wall
+
+        </div>
+        <div class="inswitch" id="likewall">
+            share like
+
+        </div>
+    </div>
+  </div>
+ 
+  <script>
+    document.getElementById('cnfwall').addEventListener('click', async (e) => {
+         window.location.href = "dating.html";
+    });
+    const supabase = window.supabase.createClient(
+      'https://wtufaboilvzfkjzzlnwt.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dWZhYm9pbHZ6Zmtqenpsbnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NzEzNjEsImV4cCI6MjA2NzQ0NzM2MX0.ntK7eFoQKamWwRaQH5Qs8J7XrtqaFPoj45wkX6aN2dI' // Replace with anon/public key
+    );   
+    window.addEventListener('DOMContentLoaded', async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+  console.log(session);
+   if (!session) {
+    alert("You must be logged in to view this page.");
+    window.location.href = "home.html"; // Redirect to login
+  }
+  else{
+    const { data : d, error : e } = await supabase
+          .from('students')
+          .select('likes, liked');
+     
+          if(!d){
+             alert("You must be logged in to view this page.");
+    window.location.href = "home.html"; // Redirect to login
+          }
+  }
+      document.getElementById('likeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        
+        const likes = document.getElementById('likes').value.trim();
+        const status = document.getElementById('status');
+        const {
+             data: { user }
+             } = await supabase.auth.getUser();
+         if(user == null){
+           status.style.color = 'red';
+          status.textContent = 'pls sign in again ';
+         }
+         const roll_number = user.user_metadata.roll_number; 
+         console.log(roll_number);// 👉 "123102120@nitkkr.ac.in"
+
+        const email = `${roll_number}@nitkkr.ac.in`;
+        
+        // Step 2: Update 'likes'
+        const { data: updateData, error: updateError } = await supabase
+          .from('students')
+          .update({ likes: likes })
+          .eq('roll_number', roll_number)
+          .select();
+
+        if (updateError) {
+          status.style.color = 'red';
+          status.textContent = '❌ Failed to update like: ' + updateError.message;
+          return;
+        }
+
+        // Step 3: Check if mutual like
+          status.style.color = '#007bff';
+          status.textContent = '✅ Like will be shared on that time  u can edit before it';
+          Swal.fire({
+          title: '💖 Like Sent!',
+           text: 'your liked will be shared today night',
+           icon: 'success',
+           <!-- showCancelButton: true, -->
+            confirmButtonText: 'okay',
+      
+            customClass: {
+             popup: 'my-swal',
+            confirmButton: 'my-confirm-btn'
+  }
+             
+            });
+        
+        document.getElementById('likeForm').reset();
+      });
+       document.getElementById('checkMatchForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const matchStatus = document.getElementById('matchStatus');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+          matchStatus.style.color = 'red';
+          matchStatus.textContent = '❌ Please sign in to check match.';
+          return;
+        }
+
+        const roll_number = user.user_metadata.roll_number;
+
+        const { data, error } = await supabase
+          .from('students')
+          .select('likes, liked')
+          .eq('roll_number', roll_number);
+
+        if (error || !data || data.length === 0) {
+          matchStatus.style.color = 'red';
+          matchStatus.textContent = '❌ Could not fetch your record.';
+          return;
+        }
+
+        const liked = data[0].liked;
+        
+
+        if (liked != 0) {
+          matchStatus.style.color = 'green';
+          matchStatus.textContent = `last 💘 Matched with Roll No. ${liked}`;
+          Swal.fire({
+             title: '💘 Match Found!',
+             text: `You and ${liked} liked each other!`,
+              icon: 'success',
+              confirmButtonText: 'Yay!',
+              customClass: {
+             popup: 'my-swal',
+            confirmButton: 'my-confirm-btn'
+  }
+            });
+        } else {
+          matchStatus.style.color = '#555';
+          matchStatus.textContent = '⌛ No match yet. Try again later.';
+        }
+      });
+
+      
+    });
+    
+  </script>
+</body>
+</html>
