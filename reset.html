@@ -158,13 +158,6 @@
         'https://wtufaboilvzfkjzzlnwt.supabase.co',
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dWZhYm9pbHZ6Zmtqenpsbnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NzEzNjEsImV4cCI6MjA2NzQ0NzM2MX0.ntK7eFoQKamWwRaQH5Qs8J7XrtqaFPoj45wkX6aN2dI'
       );
-      const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
-
-
-    if (error) {
-      alert('Error restoring session: ' + error.message);
-      return;
-    }
       
 
       document.getElementById('upd').addEventListener('click', async () => {
@@ -184,6 +177,7 @@
   </script>
 </body>
 </html>
+
 
 
 
