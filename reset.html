@@ -151,7 +151,7 @@
   }
     let supabase;
     window.addEventListener('DOMContentLoaded', async () => {
-      / Step 1: Restore session from URL (needed for password reset)
+      // Step 1: Restore session from URL (needed for password reset)
     const { data, error } = await supabase.auth.getSessionFromUrl({ storeSession: true });
 
     if (error) {
@@ -182,4 +182,5 @@
   </script>
 </body>
 </html>
+
 
