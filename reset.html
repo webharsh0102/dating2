@@ -151,6 +151,13 @@
   }
     let supabase;
     window.addEventListener('DOMContentLoaded', async () => {
+      / Step 1: Restore session from URL (needed for password reset)
+    const { data, error } = await supabase.auth.getSessionFromUrl({ storeSession: true });
+
+    if (error) {
+      alert('Error restoring session: ' + error.message);
+      return;
+    }
       const createClient = window.supabase.createClient;
       supabase = createClient(
         'https://wtufaboilvzfkjzzlnwt.supabase.co',
@@ -175,3 +182,4 @@
   </script>
 </body>
 </html>
+
